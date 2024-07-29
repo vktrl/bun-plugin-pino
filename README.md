@@ -17,6 +17,8 @@ bun add -d pino-plugin-bun
 #### Use the JS API to build
 
 ```ts
+import { bunPluginPino } from 'bun-plugin-pino';
+
 await Bun.build({
   entrypoints: ['./src/index.ts'],
   outdir: './dist',

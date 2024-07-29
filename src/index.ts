@@ -68,3 +68,5 @@ export function bunPluginPino({ transports = [] }: { transports?: string[] } = {
     },
   };
 }
+
+export default bunPluginPino;

@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vktrl/bun-plugin-pino"
+    "url": "git+https://github.com/vktrl/bun-plugin-pino.git"
   },
   "scripts": {
     "lint": "biome check --write src",

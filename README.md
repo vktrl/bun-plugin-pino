@@ -1,17 +1,18 @@
-# bun-plugin-pino
+# Bun bundler plugin for Pino
 
 ### Why?
 
 Pino uses worker threads internally. Some dependencies and any transports [need to be bundled separately](https://github.com/pinojs/pino/blob/main/docs/bundling.md) or they won't get resolved at runtime and you'll get errors like `error: unable to determine transport target for "..."`.
 
+Your bundles work on the machine that built them but break in other environments like Docker? It's because Bun will resolve and and hardcode *absolute* paths from this particular environment into the bundle. Runtime resolution of these modules will fail elsewhere.
+
 ### How?
 
-
-This plugin will bundle Pino's dependencies and transports and fixes the imports paths in the main bundle.
+This plugin bundles Pino's dependencies separately and fixes runtime imports in the main bundle.
 
 #### Install
 ```
-bun add -d pino-plugin-bun
+bun add -d bun-plugin-pino
 ```
 
 #### Use the JS API to build

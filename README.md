@@ -1,4 +1,4 @@
-# Bun bundler plugin for Pino
+# bun-plugin-pino
 
 ### Why?
 

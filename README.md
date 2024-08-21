@@ -23,8 +23,12 @@ import { bunPluginPino } from 'bun-plugin-pino';
 await Bun.build({
   entrypoints: ['./src/index.ts'],
   outdir: './dist',
-  plugins: [bunPluginPino({ transports: ['pino-loki'] })], // add any transports here
-  ...
+  plugins: [
+    bunPluginPino({
+      transports: ['pino-loki'], // any additional transports you may be using
+      // logging?: "default" | "plain" | "quiet"
+    }),
+  ], 
 });
 ```
 

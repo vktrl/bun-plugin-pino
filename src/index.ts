@@ -2,12 +2,18 @@ import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import type { BunPlugin } from 'bun';
 
-import chalk from 'chalk';
+export type BunPluginPinoOpts = { transports?: string[]; logging?: 'default' | 'plain' | 'quiet' };
 
-export function bunPluginPino({ transports = [] }: { transports?: string[] } = {}): BunPlugin {
+export function bunPluginPino({ transports = [], logging = 'default' }: BunPluginPinoOpts = {}): BunPlugin {
   return {
     name: 'pino',
     async setup(build) {
+      const yellow = (str: string) => (logging === 'default' ? `\u001b[33m${str}\u001b[0m` : str);
+      const green = (str: string) => (logging === 'default' ? `\u001b[32m${str}\u001b[0m` : str);
+      const print = (msg: string) => {
+        if (logging !== 'quiet') console.log(msg);
+      };
+
       const outdir = build.config.outdir || '';
       const pino = path.dirname(Bun.resolveSync('pino', import.meta.dir));
       const threadStream = path.dirname(Bun.resolveSync('thread-stream', import.meta.dir));
@@ -31,12 +37,12 @@ export function bunPluginPino({ transports = [] }: { transports?: string[] } = {
         depmap[transport] = Bun.resolveSync(transport, import.meta.dir);
       }
 
-      console.log(chalk.green('\nBundling Pino dependencies...\n'));
+      print(green('\nBundling Pino dependencies...\n'));
 
       for (const [key, entry] of Object.entries(depmap)) {
         const naming = `${key.replace('/', '-')}.js`;
         const outpath = path.relative(process.cwd(), path.join(outdir, naming));
-        console.log(`  ${chalk.yellow(key)}\n      ${path.relative(process.cwd(), entry)} -> ${outpath}\n`);
+        print(`  ${yellow(key)}\n      ${path.relative(process.cwd(), entry)} -> ${outpath}\n`);
         const { sourcemap, minify } = build.config;
         await Bun.build({ entrypoints: [entry], outdir, naming, target: 'bun', sourcemap, minify });
       }
@@ -61,7 +67,7 @@ export function bunPluginPino({ transports = [] }: { transports?: string[] } = {
 
         lines.push(await Bun.file(args.path).text());
 
-        console.log(chalk.green('Injected path overrides\n'));
+        print(`${green('Done')}\n`);
 
         return { contents: lines.join('\n') };
       });

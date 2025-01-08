@@ -77,7 +77,7 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
         lines.push("  const path = require('node:path');");
         lines.push('  const overrides = {');
         for (const dep of Object.keys(depmap)) {
-          lines.push(`    '${dep}': path.resolve(import.meta.dir, '${dep.replace('/', '-')}.js'),`);
+          lines.push(`    '${dep}': path.resolve(${dirname}, '${dep.replace('/', '-')}.js'),`);
         }
         lines.push('};');
         lines.push(

@@ -55,19 +55,17 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
 
         // Bun: https://bun.sh/guides/util/import-meta-dir
         // Node: https://nodejs.org/api/esm.html#importmetadirname
-        // This supports node 20 and up. 
-        let dirname;
+        // This supports node 20 and up.
+        let dirname: string;
         switch (build.config.target) {
-          case "node":
-            dirname = "import.meta.dirname";
+          case 'node':
+            dirname = build.config.format === 'cjs' ? '__dirname' : 'import.meta.dirname';
             break;
-          case "bun":
-            dirname = "import.meta.dir";
+          case 'bun':
+            dirname = 'import.meta.dir';
             break;
-          case "browser":
-            throw new Error(
-              "Pino plugin is not (yet) supported in browser target",
-            );
+          case 'browser':
+            throw new Error('Pino plugin is not (yet) supported in browser target');
           default:
             throw new Error(`Unsupported target: ${build.config.target}`);
         }

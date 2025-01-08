@@ -52,6 +52,26 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
       build.onLoad({ filter: /\/pino\.js$/ }, async (args) => {
         if (injected) return;
         injected = true;
+
+        // Bun: https://bun.sh/guides/util/import-meta-dir
+        // Node: https://nodejs.org/api/esm.html#importmetadirname
+        // This supports node 20 and up. 
+        let dirname;
+        switch (build.config.target) {
+          case "node":
+            dirname = "import.meta.dirname";
+            break;
+          case "bun":
+            dirname = "import.meta.dir";
+            break;
+          case "browser":
+            throw new Error(
+              "Pino plugin is not (yet) supported in browser target",
+            );
+          default:
+            throw new Error(`Unsupported target: ${build.config.target}`);
+        }
+
         const lines: string[] = [];
         lines.push('(() => {');
         lines.push("  const path = require('node:path');");

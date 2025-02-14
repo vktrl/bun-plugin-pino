@@ -44,30 +44,25 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
         const outpath = path.relative(process.cwd(), path.join(outdir, naming));
         print(`  ${yellow(key)}\n      ${path.relative(process.cwd(), entry)} -> ${outpath}\n`);
         const { sourcemap, minify } = build.config;
-        await Bun.build({ entrypoints: [entry], outdir, naming, target: 'bun', sourcemap, minify });
+        await Bun.build({
+          entrypoints: [entry],
+          outdir,
+          naming,
+          target: build.config.target,
+          format: build.config.format,
+          sourcemap,
+          minify,
+        });
       }
 
       let injected = false;
 
-      build.onLoad({ filter: /\/pino\.js$/ }, async (args) => {
+      build.onLoad({ filter: /[\/|\\]pino\.js$/ }, async (args) => {
         if (injected) return;
         injected = true;
 
-        // Bun: https://bun.sh/guides/util/import-meta-dir
-        // Node: https://nodejs.org/api/esm.html#importmetadirname
-        // This supports node 20 and up.
-        let dirname: string;
-        switch (build.config.target) {
-          case 'node':
-            dirname = build.config.format === 'cjs' ? '__dirname' : 'import.meta.dirname';
-            break;
-          case 'bun':
-            dirname = 'import.meta.dir';
-            break;
-          case 'browser':
-            throw new Error('Pino plugin is not (yet) supported in browser target');
-          default:
-            throw new Error(`Unsupported target: ${build.config.target}`);
+        if (build.config.target === 'browser') {
+          throw new Error('Pino plugin is not (yet) supported in browser');
         }
 
         const lines: string[] = [];
@@ -75,7 +70,7 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
         lines.push("  const path = require('node:path');");
         lines.push('  const overrides = {');
         for (const dep of Object.keys(depmap)) {
-          lines.push(`    '${dep}': path.resolve(${dirname}, '${dep.replace('/', '-')}.js'),`);
+          lines.push(`    '${dep}': path.resolve('${dep.replace('/', '-')}.js'),`);
         }
         lines.push('};');
         lines.push(

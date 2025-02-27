@@ -2,6 +2,6 @@ FROM oven/bun:alpine
 
 WORKDIR /app
 
-COPY . .
+COPY . ./dist
 
-RUN bun app.js
+RUN bun ./dist/app.js

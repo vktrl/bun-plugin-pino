@@ -14,6 +14,14 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
         if (logging !== 'quiet') console.log(msg);
       };
 
+      if (build.config.format === 'cjs') {
+        throw new Error('CJS is not supported');
+      }
+
+      if (build.config.target === 'browser') {
+        throw new Error('Bundling for browsers is not supported');
+      }
+
       const outdir = build.config.outdir || '';
       const pino = path.dirname(Bun.resolveSync('pino', import.meta.dir));
       const threadStream = path.dirname(Bun.resolveSync('thread-stream', import.meta.dir));
@@ -57,20 +65,18 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
 
       let injected = false;
 
+      const dirname = build.config.target === 'node' ? 'import.meta.dirname' : 'import.meta.dir';
+
       build.onLoad({ filter: /[\/|\\]pino\.js$/ }, async (args) => {
         if (injected) return;
         injected = true;
-
-        if (build.config.target === 'browser') {
-          throw new Error('Pino plugin is not (yet) supported in browser');
-        }
 
         const lines: string[] = [];
         lines.push('(() => {');
         lines.push("  const path = require('node:path');");
         lines.push('  const overrides = {');
         for (const dep of Object.keys(depmap)) {
-          lines.push(`    '${dep}': path.resolve('${dep.replace('/', '-')}.js'),`);
+          lines.push(`    '${dep}': path.resolve(${dirname}, '${dep.replace('/', '-')}.js'),`);
         }
         lines.push('};');
         lines.push(

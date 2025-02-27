@@ -8,7 +8,7 @@ Do your bundles work on the machine that built them, but break in other environm
 
 ### How?
 
-This plugin bundles Pino's dependencies separately and fixes runtime imports in the main bundle. It supports Node and Bun targets and CJS and ESM formats.
+This plugin bundles Pino's dependencies separately and fixes runtime imports in the main bundle. It supports Node and Bun targets with **ESM format only**.
 
 #### Install
 

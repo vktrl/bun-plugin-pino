@@ -2,9 +2,21 @@ import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import type { BunPlugin } from 'bun';
 
-export type BunPluginPinoOpts = { transports?: string[]; logging?: 'default' | 'plain' | 'quiet' };
+export type BunPluginPinoOpts = {
+  transports?: string[];
+  logging?: 'default' | 'plain' | 'quiet';
+  /**
+   * Resolve transports from current working directory
+   * instead of package's directory
+   */
+  cwd?: boolean;
+};
 
-export function bunPluginPino({ transports = [], logging = 'default' }: BunPluginPinoOpts = {}): BunPlugin {
+export function bunPluginPino({
+  transports = [],
+  logging = 'default',
+  cwd = false,
+}: BunPluginPinoOpts = {}): BunPlugin {
   return {
     name: 'pino',
     async setup(build) {
@@ -42,7 +54,7 @@ export function bunPluginPino({ transports = [], logging = 'default' }: BunPlugi
       }
 
       for (const transport of transports) {
-        depmap[transport] = Bun.resolveSync(transport, import.meta.dir);
+        depmap[transport] = Bun.resolveSync(transport, cwd ? process.cwd() : import.meta.dir);
       }
 
       print(green('\nBundling Pino dependencies...\n'));

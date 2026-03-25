@@ -6,16 +6,16 @@ export type BunPluginPinoOpts = {
   transports?: string[];
   logging?: 'default' | 'plain' | 'quiet';
   /**
-   * Resolve transports from current working directory
-   * instead of package's directory
+   * Directory to resolve the transports from
+   * @default import.meta.dir
    */
-  cwd?: boolean;
+  root?: string;
 };
 
 export function bunPluginPino({
   transports = [],
   logging = 'default',
-  cwd = false,
+  root = import.meta.dir,
 }: BunPluginPinoOpts = {}): BunPlugin {
   return {
     name: 'pino',
@@ -54,7 +54,7 @@ export function bunPluginPino({
       }
 
       for (const transport of transports) {
-        depmap[transport] = Bun.resolveSync(transport, cwd ? process.cwd() : import.meta.dir);
+        depmap[transport] = Bun.resolveSync(transport, root);
       }
 
       print(green('\nBundling Pino dependencies...\n'));

@@ -1,8 +1,7 @@
-import { afterAll, describe, expect, it } from 'bun:test';
+import { expect, it } from 'bun:test';
 import path from 'node:path';
-import bunPluginPino from '../..';
-
 import { $ } from 'bun';
+import bunPluginPino from '../..';
 
 it.each(['bun', 'node'] as const)(
   'should work with %s',

@@ -6,7 +6,7 @@ export type BunPluginPinoOpts = {
   transports?: string[];
   logging?: 'default' | 'plain' | 'quiet';
   /**
-   * Directory to resolve the transports from
+   * Directory to resolve the dependencies from
    * @default import.meta.dir
    */
   root?: string;
@@ -35,8 +35,8 @@ export function bunPluginPino({
       }
 
       const outdir = build.config.outdir || '';
-      const pino = path.dirname(Bun.resolveSync('pino', import.meta.dir));
-      const threadStream = path.dirname(Bun.resolveSync('thread-stream', import.meta.dir));
+      const pino = path.dirname(Bun.resolveSync('pino', root));
+      const threadStream = path.dirname(Bun.resolveSync('thread-stream', root));
 
       const depmap: Record<string, string> = {
         'thread-stream-worker': path.join(threadStream, 'lib/worker.js'),
@@ -49,7 +49,7 @@ export function bunPluginPino({
         const pinoPipelineWorker = path.join(pino, 'lib/worker-pipeline.js');
         await stat(pinoPipelineWorker);
         depmap['pino-pipeline-worker'] = pinoPipelineWorker;
-      } catch (err) {
+      } catch (_err) {
         // Ignored
       }
 
@@ -79,7 +79,7 @@ export function bunPluginPino({
 
       const dirname = build.config.target === 'node' ? 'import.meta.dirname' : 'import.meta.dir';
 
-      build.onLoad({ filter: /[\/|\\]pino\.js$/ }, async (args) => {
+      build.onLoad({ filter: /[/|\\]pino\.js$/ }, async (args) => {
         if (injected) return;
         injected = true;
 

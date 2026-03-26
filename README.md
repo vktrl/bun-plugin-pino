@@ -28,6 +28,7 @@ await Bun.build({
     bunPluginPino({
       transports: ['pino-loki'], // any additional transports you may be using
       // logging?: "default" | "plain" | "quiet"
+      // root?: "custom/path/for/resolving/modules"
     }),
   ],
 });
